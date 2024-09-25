@@ -1,0 +1,97 @@
+static const char *alpha[] = {
+    ".-",   //A
+    "-...", //B
+    "-.-.", //C
+    "-..",  //D
+    ".",    //E
+    "..-.", //F
+    "--.",  //G
+    "....", //H
+    "..",   //I
+    ".---", //J
+    "-.-",  //K
+    ".-..", //L
+    "--",   //M
+    "-.",   //N
+    "---",  //O
+    ".--.", //P
+    "--.-", //Q
+    ".-.",  //R
+    "...",  //S
+    "-",    //T
+    "..-",  //U
+    "...-", //V
+    ".--",  //W
+    "-..-", //X
+    "-.--", //Y
+    "--..", //Z
+};
+
+const int LedPin = 6;
+
+int i;
+
+String a = "";
+
+String morse = "";
+
+void setup() {
+  pinMode(LedPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  while(Serial.available()) {
+    a = Serial.readString();
+    Serial.println(a);
+    for (i = 0; i < a.length(); i++) {
+      char c = a.charAt(i);
+      if(c == ' ') {
+        morse += '/';
+      }
+      else {
+        if (a.charAt(i + 1) == ' ' || i == a.length() - 1) {
+          morse += encode(c);
+        }
+        else {
+          morse += encode(c) + '|';
+        }
+      }
+      Serial.println(c);
+    }
+    Serial.println(morse);
+    showLed(morse);
+    morse = "";
+  }
+}
+
+String encode(char c){
+  return alpha[c - 'a'];
+}
+
+void showLed(String morse) {
+  for (i = 0; i < morse.length(); i++) {
+    if(morse.charAt(i) == '.'){
+      digitalWrite(LedPin, HIGH);
+      delay(200);
+      digitalWrite(LedPin, LOW);
+      if (morse.charAt(i + 1) != '/' || morse.charAt(i + 1) != '|') {
+        delay(200);
+      }
+    }
+    else if (morse.charAt(i) == '-') {
+      digitalWrite(LedPin, HIGH);
+      delay(600);
+      digitalWrite(LedPin, LOW);
+      if (morse.charAt(i + 1) != '/' || morse.charAt(i + 1) != '|') {
+        delay(200);
+      }
+    }
+    else if (morse.charAt(i) == '/') {
+      delay(1400);
+    }
+    else {
+      delay(600);
+    }
+  }
+}
